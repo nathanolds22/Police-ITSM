@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UK Police IT & ITSM Spending Landscape</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F9FA;
+            color: #212529;
+        }
+        .brand-blue { color: #007BFF; }
+        .brand-orange { color: #FFA500; }
+        .brand-yellow { color: #FFD700; }
+        .brand-green { color: #28A745; }
+        .bg-brand-blue { background-color: #007BFF; }
+        .bg-brand-orange { background-color: #FFA500; }
+        .bg-brand-yellow { background-color: #FFD700; }
+        .bg-brand-green { background-color: #28A745; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .big-stat-number {
+            font-size: 3rem;
+            line-height: 1;
+            font-weight: 700;
+        }
+        .big-stat-label {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: #495057;
+        }
+        .section-intro-text {
+            font-size: 1.125rem;
+            line-height: 1.75;
+            color: #343A40;
+        }
+        .visualization-context-text {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #495057;
+            margin-top: 0.5rem;
+        }
+        .flowchart-item {
+            border: 2px solid #007BFF;
+            padding: 0.75rem;
+            text-align: center;
+            border-radius: 0.5rem;
+            background-color: #FFFFFF;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .flowchart-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #007BFF;
+        }
+        .llm-output-box {
+            background-color: #e2f0ff;
+            border-left: 4px solid #007BFF;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-style: italic;
+            color: #004085;
+        }
+        .llm-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            color: #007BFF;
+        }
+        .llm-loading::before {
+            content: '⚙️';
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-brand-blue text-white py-8 shadow-lg">
+        <div class="container mx-auto px-6 text-center">
+            <h1 class="text-4xl font-bold">UK Policing: IT & ITSM Spending Landscape</h1>
+            <p class="mt-2 text-lg">An Infographic Overview Based on Market Research</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="overview-funding" class="mb-16">
+            <h2 class="text-3xl font-semibold mb-4 brand-blue border-b-2 border-brand-orange pb-2">1. UK Policing: Scale and Financial Foundation</h2>
+            <p class="section-intro-text mb-8">
+                The United Kingdom's policing structure is extensive and operates under a complex, hybrid funding model. Understanding this foundational context is crucial for appreciating the scale of potential IT and IT Service Management (ITSM) investments.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="big-stat-number brand-orange">48</div>
+                    <div class="big-stat-label mt-2">Total Police Forces</div>
+                    <p class="visualization-context-text">Comprising 45 territorial forces (43 in England & Wales, Police Scotland, PSNI) and 3 national specialized forces (BTP, CNC, MDP).</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="big-stat-number brand-green">£18.6B+</div>
+                    <div class="big-stat-label mt-2">Annual Policing Funding (England & Wales FY2025)</div>
+                    <p class="visualization-context-text">A substantial budget primarily sourced from central government grants and local council tax precepts, overseen by Police and Crime Commissioners (PCCs).</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md md:col-span-1 flex flex-col items-center justify-center">
+                    <h3 class="text-xl font-semibold mb-3 text-center brand-blue">Primary Funding Sources (England & Wales)</h3>
+                    <div class="chart-container w-full h-64 md:h-72 max-w-xs">
+                        <canvas id="fundingSourcesChart"></canvas>
+                    </div>
+                    <p class="visualization-context-text text-center mt-3">Council tax precepts are an increasingly vital component, rising to ~35.1% of total funding, granting PCCs significant budgetary influence.</p>
+                </div>
+            </div>
+             <p class="section-intro-text mt-4">
+                Police and Crime Commissioners (PCCs) hold significant power, setting budgets, regulating expenditure, and holding Chief Constables accountable. This decentralized financial authority means IT spending decisions are influenced by local priorities alongside national strategies.
+            </p>
+        </section>
+
+        <section id="it-spending" class="mb-16">
+            <h2 class="text-3xl font-semibold mb-4 brand-blue border-b-2 border-brand-orange pb-2">2. Illuminating IT Expenditure in UK Policing</h2>
+            <p class="section-intro-text mb-8">
+                Within the substantial overall policing budget, Information Technology and digital transformation represent a critical and growing area of investment. However, this landscape is marked by the challenge of legacy systems consuming a large share of resources.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center flex flex-col justify-center items-center">
+                    <div class="big-stat-number brand-orange">£1.8B+</div>
+                    <div class="big-stat-label mt-2">Estimated Annual IT & Digitalisation Spend (UK Policing)</div>
+                    <p class="visualization-context-text">Technology systems and end-to-end digitalisation account for over 10% of total police spending, indicating a vast market for IT solutions and services.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold mb-3 text-center brand-blue">Police Digital Service (PDS) - Key IT Project Funding (FY2023/24)</h3>
+                    <div class="chart-container w-full h-96 md:h-[450px] max-w-full">
+                        <canvas id="pdsSpendingChart"></canvas>
+                    </div>
+                    <p class="visualization-context-text text-center mt-3">PDS plays a pivotal role in national IT initiatives, with significant investments in areas like Digital Forensics and Cybersecurity, all requiring robust ITSM.</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-3 brand-blue">The Legacy System Challenge</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-5xl font-bold brand-orange">60-70%</p>
+                        <p class="mt-1 text-gray-600">Proportion of outdated systems in some forces, with the Met Police historically noting 70% redundancy.</p>
+                    </div>
+                    <div>
+                        <p class="text-5xl font-bold brand-orange">~90%</p>
+                        <p class="mt-1 text-gray-600">Of IT budget in some cases spent on maintaining old systems, hindering innovation and digital transformation.</p>
+                    </div>
+                </div>
+                <p class="visualization-context-text mt-4">This "technical debt" diverts resources from modernization, impacting officer productivity and the ability to combat evolving digital crime. Effective ITSM is crucial for managing this transition.</p>
+            </div>
+        </section>
+
+        <section id="itsm-role" class="mb-16">
+            <h2 class="text-3xl font-semibold mb-4 brand-blue border-b-2 border-brand-orange pb-2">3. IT Service Management (ITSM): The Engine of Modern Policing Tech</h2>
+            <p class="section-intro-text mb-8">
+                IT Service Management is not merely IT support; it's a strategic approach to designing, delivering, managing, and improving how technology is used within an organization. For modern policing, effective ITSM is paramount for operational continuity, efficiency, and the successful adoption of new digital tools.
+            </p>
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-center brand-blue">Core Components of IT Service Management</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 items-stretch">
+                    <div class="flowchart-item">Incident Management</div>
+                    <div class="flowchart-arrow hidden sm:flex">➔</div>
+                    <div class="flowchart-item">Problem Management</div>
+                    <div class="flowchart-arrow hidden md:flex">➔</div>
+                    <div class="flowchart-item">Change Management</div>
+                    <div class="flowchart-arrow hidden lg:flex">➔</div>
+                    <div class="flowchart-item">Knowledge Management</div>
+                    <div class="flowchart-item mt-4 sm:mt-0">Asset Management</div>
+                    <div class="flowchart-arrow hidden sm:flex mt-4 sm:mt-0">➔</div>
+                    <div class="flowchart-item mt-4 sm:mt-0">Service Request Management</div>
+                     <div class="flowchart-arrow hidden md:flex mt-4 md:mt-0">➔</div>
+                    <div class="flowchart-item mt-4 md:mt-0">Service Level Management</div>
+                    <div class="flowchart-arrow hidden lg:flex mt-4 lg:mt-0">➔</div>
+                    <div class="flowchart-item mt-4 lg:mt-0">Configuration Management</div>
+                </div>
+                <p class="visualization-context-text text-center mt-4">These interconnected processes, often guided by frameworks like ITIL, ensure IT services align with policing objectives, enhance user satisfaction, and support continuous improvement.</p>
+                <div class="mt-6 text-center">
+                    <button id="itsmInsightBtn" class="bg-brand-green hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                        ✨ Get ITSM Insight
+                    </button>
+                    <div id="itsmInsightOutput" class="llm-output-box hidden text-left"></div>
+                    <div id="itsmInsightLoading" class="llm-loading hidden">Generating insight...</div>
+                </div>
+            </div>
+            <p class="section-intro-text">
+                The National Policing Digital Strategy's goals of data-driven, AI-powered, and cloud-centric operations are unachievable without a mature ITSM foundation. ITSM underpins the deployment, maintenance, and optimization of new technologies, ensuring they deliver tangible benefits to frontline policing.
+            </p>
+        </section>
+
+        <section id="digital-transformation" class="mb-16">
+            <h2 class="text-3xl font-semibold mb-4 brand-blue border-b-2 border-brand-orange pb-2">4. Navigating Digital Transformation and Emerging Technologies</h2>
+            <p class="section-intro-text mb-8">
+                UK policing is on a significant journey of digital transformation, driven by the need to combat increasingly sophisticated crime and improve operational efficiency. The National Policing Digital Strategy (2020-2030) aims to unlock the potential of data and technology, but faces the reality of a considerable legacy estate.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="big-stat-number brand-green">>90%</div>
+                    <div class="big-stat-label mt-2">Of Reported Crime Has a Digital Element</div>
+                    <p class="visualization-context-text">Underscoring the critical need for advanced digital capabilities and robust cybersecurity measures, supported by effective ITSM.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="big-stat-number brand-green">38M</div>
+                    <div class="big-stat-label mt-2">Police Hours Annually Targeted for Savings via Technology</div>
+                    <p class="visualization-context-text">A key government objective highlighting the drive for productivity gains through technology, where ITSM ensures reliability and user adoption.</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-4 text-center brand-blue">Key Emerging Technologies in Policing</h3>
+                <ul id="emergingTechList" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <li class="p-4 bg-gray-100 rounded-lg shadow" data-tech="Artificial Intelligence (AI)"><span class="text-3xl">🧠</span><p class="mt-2 font-semibold">Artificial Intelligence (AI)</p><p class="text-xs text-gray-600">For data analysis, automation, predictive policing.</p></li>
+                    <li class="p-4 bg-gray-100 rounded-lg shadow" data-tech="Digital Forensics"><span class="text-3xl">💻</span><p class="mt-2 font-semibold">Digital Forensics</p><p class="text-xs text-gray-600">Managing vast digital evidence, complex investigations.</p></li>
+                    <li class="p-4 bg-gray-100 rounded-lg shadow" data-tech="Drone Technology"><span class="text-3xl">🚁</span><p class="mt-2 font-semibold">Drone Technology</p><p class="text-xs text-gray-600">Enhanced surveillance and operational support.</p></li>
+                    <li class="p-4 bg-gray-100 rounded-lg shadow" data-tech="Cybersecurity"><span class="text-3xl">🛡️</span><p class="mt-2 font-semibold">Cybersecurity</p><p class="text-xs text-gray-600">Protecting systems and data from increasing threats.</pFriendly message.</p></li>
+                </ul>
+                <p class="visualization-context-text text-center mt-4">The adoption of these technologies introduces new complexities, demanding sophisticated ITSM processes for optimal operation, incident resolution, and configuration management.</p>
+                <div class="mt-6 text-center">
+                    <button id="techOpportunityBtn" class="bg-brand-green hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                        ✨ Analyze Tech Opportunity
+                    </button>
+                    <div id="techOpportunityOutput" class="llm-output-box hidden text-left"></div>
+                    <div id="techOpportunityLoading" class="llm-loading hidden">Analyzing technology...</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="market-opportunities" class="mb-16">
+            <h2 class="text-3xl font-semibold mb-4 brand-blue border-b-2 border-brand-orange pb-2">5. Market Opportunities and Procurement Channels</h2>
+            <p class="section-intro-text mb-8">
+                The drive for modernization creates significant opportunities for ITSM solution providers. National bodies and individual forces are actively procuring IT services and solutions, though isolating specific ITSM expenditure from broader budgets remains a challenge.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                 <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="big-stat-number brand-orange">£223M+</div>
+                    <div class="big-stat-label mt-2">Savings Generated by PDS (FY18/19-23/24)</div>
+                    <p class="visualization-context-text">Demonstrating the impact of centralized initiatives in driving efficiency and value in IT procurement.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="big-stat-number brand-orange">£27.1M</div>
+                    <div class="big-stat-label mt-2">Police ICT Company</div>
+                    <p class="visualization-context-text">Illustrates large-scale investments in technology transformation already taking place within the pl</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                    <div class="big-stat-number brand-orange">55%</div>
+                    <div class="big-stat-label mt-2">Public Sector Digital Spend on External Contractors</div>
+                    <p class="visualization-context-text">Indicating heavy reliance on outsourced IT, necessitating robust ITSM for supplier and contract management.</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-3 text-center brand-blue">Examples of Recent UK Police IT/ITSM-Related Contract Values</h3>
+                <div class="chart-container w-full h-96 md:h-[450px] max-w-full">
+                    <canvas id="recentContractsChart"></canvas>
+                </div>
+                <p class="visualization-context-text text-center mt-3">Public procurement portals (Contracts Finder, Find a Tender) reveal active market demand for IT services, cybersecurity, and technology programs, all with ITSM implications. BlueLight Commercial now leads national IT procurement, offering a key engagement point.</p>
+            </div>
+        </section>
+
+        <section id="itsm-estimation-conclusion" class="mb-16">
+            <h2 class="text-3xl font-semibold mb-4 brand-blue border-b-2 border-brand-orange pb-2">6. Estimating ITSM Spending and Future Outlook</h2>
+            <p class="section-intro-text mb-8">
+                While precise ITSM spending figures are embedded within broader IT budgets, analysis of projects, operational needs, and overall IT expenditure indicates a substantial, multi-hundred-million-pound market. ITSM is not an optional extra but a fundamental operational necessity.
+            </p>
+            <div class="bg-white p-8 rounded-lg shadow-xl text-center mb-8">
+                <div class="big-stat-number brand-blue">£100s M</div>
+                <div class="big-stat-label mt-2">Inferred Annual ITSM-Related Spending</div>
+                <p class="visualization-context-text max-w-2xl mx-auto">
+                    Given the >£1.8 billion annual IT spend and the critical role of ITSM in maintaining legacy systems (often 20-40%+ of IT operational costs) and enabling new digital initiatives, the investment in ITSM functions is undeniably significant, running into hundreds of millions of pounds annually across UK policing.
+                </p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-xl font-semibold mb-3 brand-blue">Conclusion & Key Takeaways for ITSM Providers</h3>
+                <p class="text-gray-700 mb-4">The UK policing sector is a dynamic market for ITSM solutions, driven by the urgent need for digital transformation, efficiency gains, and the challenge of modernizing a complex legacy IT estate. Opportunities abound for providers who can demonstrate clear value in:</p>
+                <ul class="list-disc list-inside space-y-2 text-gray-700">
+                    <li><strong class="text-brand-orange">Enhancing Officer Productivity:</strong> Streamlining IT operations to free up frontline time.</li>
+                    <li><strong class="text-brand-orange">Supporting Digital Transformation:</strong> Providing a stable foundation for AI, cloud, and digital forensics.</li>
+                    <li><strong class="text-brand-orange">Optimizing Legacy Systems:</strong> Improving management and facilitating migration from outdated infrastructure.</li>
+                    <li><strong class="text-brand-orange">Improving Service Delivery:</strong> Ensuring reliable and responsive IT support for all police personnel.</li>
+                    <li><strong class="text-brand-orange">Driving Cost Efficiency:</strong> Optimizing IT asset use and managing third-party supplier contracts effectively.</li>
+                </ul>
+                <p class="mt-4 text-gray-700">Engaging with national bodies like BlueLight Commercial and individual forces through targeted research and value propositions aligned with their specific pain points and strategic objectives will be key to success in this evolving market.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8 text-center">
+        <div class="container mx-auto px-6">
+            <p>&copy; 2025 Market Research Infographic. All data derived from public domain research.</p>
+            <p class="text-xs mt-1">This is a conceptual infographic for demonstration purposes.</p>
+        </div>
+    </footer>
+
+    <script>
+        const CHART_COLORS = {
+            blue: '#007BFF',
+            orange: '#FFA500',
+            yellow: '#FFD700',
+            green: '#28A745',
+            purple: '#6F42C1',
+            red: '#DC3545',
+            teal: '#20C997',
+            gray: '#6C757D'
+        };
+
+        function processLabel(label, maxLength = 16) {
+            if (typeof label !== 'string' || label.length <= maxLength) {
+                return label;
+            }
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + word).length > maxLength && currentLine.length > 0) {
+                    lines.push(currentLine.trim());
+                    currentLine = word + ' ';
+                } else {
+                    currentLine += word + ' ';
+                }
+            }
+            if (currentLine.trim().length > 0) {
+                lines.push(currentLine.trim());
+            }
+            return lines;
+        }
+        
+        const commonTooltipTitleCallback = function(tooltipItems) {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+              return label.join(' ');
+            } else {
+              return label;
+            }
+        };
+
+        // Chart 1: Funding Sources
+        const fundingData = {
+            labels: [processLabel('Central Government Grants'), processLabel('Local Council Tax Precepts & Other')],
+            datasets: [{
+                label: 'Funding Sources',
+                data: [64.9, 35.1],
+                backgroundColor: [CHART_COLORS.blue, CHART_COLORS.orange],
+                borderColor: ['#FFFFFF', '#FFFFFF'],
+                borderWidth: 2
+            }]
+        };
+        new Chart(document.getElementById('fundingSourcesChart'), {
+            type: 'doughnut',
+            data: fundingData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: { callbacks: { title: commonTooltipTitleCallback } }
+                }
+            }
+        });
+
+        // Chart 2: PDS Spending
+        const pdsLabels = [
+            processLabel('Digital Forensics Programme'), 
+            processLabel('NMC (Cyber Security Centre)'), 
+            processLabel('Cyber Support'), 
+            processLabel('Digital Fingerprint Capability'), 
+            processLabel('LudusUK Football Policing Unit'),
+            processLabel('Digital Case File Project')
+        ];
+        const pdsSpendingData = {
+            labels: pdsLabels,
+            datasets: [{
+                label: 'PDS Project Funding (£M)',
+                data: [8.2, 6.56, 5.26, 3.75, 2.18, 1.14],
+                backgroundColor: [CHART_COLORS.blue, CHART_COLORS.orange, CHART_COLORS.green, CHART_COLORS.yellow, CHART_COLORS.purple, CHART_COLORS.teal],
+            }]
+        };
+        new Chart(document.getElementById('pdsSpendingChart'), {
+            type: 'bar',
+            data: pdsSpendingData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: { beginAtZero: true, title: { display: true, text: 'Funding (£ Millions)'} },
+                    y: { ticks: { autoSkip: false } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { title: commonTooltipTitleCallback } }
+                }
+            }
+        });
+        
+        // Chart 3: Recent Contracts
+         const contractLabels = [
+            processLabel('MOPAC Tech Replacement'), 
+            processLabel('Lincolnshire IT Services'),
+            processLabel('Staffordshire Training'),
+            processLabel('BTP Cyber Risk Mgmt')
+        ];
+        const contractsData = {
+            labels: contractLabels,
+            datasets: [{
+                label: 'Contract Value (£)',
+                data: [27951268, 530500, 80194, 59999],
+                backgroundColor: [CHART_COLORS.green, CHART_COLORS.blue, CHART_COLORS.orange, CHART_COLORS.yellow],
+            }]
+        };
+        new Chart(document.getElementById('recentContractsChart'), {
+            type: 'bar',
+            data: contractsData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: { 
+                        beginAtZero: true, 
+                        title: { display: true, text: 'Contract Value (£)'},
+                        ticks: {
+                            callback: function(value, index, values) {
+                                if (value >= 1000000) return (value / 1000000) + 'M';
+                                if (value >= 1000) return (value / 1000) + 'K';
+                                return value;
+                            }
+                        }
+                    },
+                    y: { ticks: { autoSkip: false } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { 
+                        callbacks: { 
+                            title: commonTooltipTitleCallback,
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.x !== null) {
+                                    label += new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(context.parsed.x);
+                                }
+                                return label;
+                            }
+                        } 
+                    }
+                }
+            }
+        });
+
+        // Gemini API Integration
+        const API_KEY = "";
+
+        async function callGeminiAPI(prompt, outputElement, loadingElement) {
+            outputElement.classList.add('hidden');
+            loadingElement.classList.remove('hidden');
+            outputElement.innerHTML = '';
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    outputElement.innerHTML = text;
+                    outputElement.classList.remove('hidden');
+                } else {
+                    outputElement.innerHTML = "Sorry, I couldn't generate a response. Please try again.";
+                    outputElement.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                outputElement.innerHTML = "An error occurred while fetching data. Please check your connection.";
+                outputElement.classList.remove('hidden');
+            } finally {
+                loadingElement.classList.add('hidden');
+            }
+        }
+
+        // ITSM Insight Generator
+        const itsmInsightBtn = document.getElementById('itsmInsightBtn');
+        const itsmInsightOutput = document.getElementById('itsmInsightOutput');
+        const itsmInsightLoading = document.getElementById('itsmInsightLoading');
+        const itsmComponents = [
+            "Incident Management", "Problem Management", "Change Management",
+            "Knowledge Management", "Asset Management", "Service Request Management",
+            "Service Level Management", "Configuration Management", "ITIL Framework"
+        ];
+
+        itsmInsightBtn.addEventListener('click', () => {
+            const randomComponent = itsmComponents[Math.floor(Math.random() * itsmComponents.length)];
+            const prompt = `Explain the importance of "${randomComponent}" in the context of IT Service Management (ITSM) within a large public sector organization like UK policing. Keep the explanation concise, about 2-3 sentences.`;
+            callGeminiAPI(prompt, itsmInsightOutput, itsmInsightLoading);
+        });
+
+        // Tech Opportunity Analyzer
+        const techOpportunityBtn = document.getElementById('techOpportunityBtn');
+        const techOpportunityOutput = document.getElementById('techOpportunityOutput');
+        const techOpportunityLoading = document.getElementById('techOpportunityLoading');
+        const emergingTechElements = document.querySelectorAll('#emergingTechList li');
+        const emergingTechnologies = Array.from(emergingTechElements).map(el => el.dataset.tech);
+
+        techOpportunityBtn.addEventListener('click', () => {
+            const randomTech = emergingTechnologies[Math.floor(Math.random() * emergingTechnologies.length)];
+            const prompt = `Given the emerging technology "${randomTech}" in UK policing, what is a potential market opportunity or a key challenge for IT Service Management (ITSM) solution providers? Provide a concise insight in 2-3 sentences.`;
+            callGeminiAPI(prompt, techOpportunityOutput, techOpportunityLoading);
+        });
+
+    </script>
+</body>
+</html>
